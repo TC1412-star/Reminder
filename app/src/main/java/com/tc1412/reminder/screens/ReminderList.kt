@@ -1,6 +1,7 @@
 package com.tc1412.reminder.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,12 +34,16 @@ fun ReminderList() {
 @Composable
 fun ReminderList(rem: List<Reminder>, onCreate: () -> Unit, onReminder: (Int) -> Unit) {
     Scaffold(topBar = { TopAppBar(title = {Text("Recordatorios")}) }, floatingActionButton = { FloatingActionButton(onCreate) { Text("+") } }) { innerPadding ->
-        LazyColumn(Modifier.padding(innerPadding), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            itemsIndexed(rem) { index, item ->
-                val idx = index
-                ReminderCard(item, { onReminder(idx) })
+        if(rem.isEmpty())
+            Row(Modifier.padding(innerPadding).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Text("No hay recordatorios actualmente.")
             }
-        }
+        else
+            LazyColumn(Modifier.padding(innerPadding), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                itemsIndexed(rem) { index, item ->
+                    ReminderCard(item, { onReminder(index) })
+                }
+            }
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)

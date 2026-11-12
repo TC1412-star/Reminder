@@ -13,7 +13,14 @@ import com.tc1412.reminder.screens.ReminderDetails
 import com.tc1412.reminder.screens.ReminderList
 import com.tc1412.reminder.screens.ReminderListError
 import com.tc1412.reminder.screens.ReminderNew
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.tc1412.reminder.repositories.TestRepository
+import com.tc1412.reminder.viewmodels.ReminderList as ReminderListView
 
+private val repository = TestRepository()
+private val reminderListState = ReminderListView(repository)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
@@ -24,11 +31,11 @@ fun AppNavigation() {
         startDestination = "list"
     ) {
         composable("list") {
-            when(appStatus) {
+            when(val appStatus = reminderListState.appStatus.collectAsStateWithLifecycle().value) {
                 is AppStatus.Loading -> ReminderList()
-                is AppStatus.Error -> ReminderListError((appStatus as AppStatus.Error).message, { /*System.out.print("Reintentando... (simulado)")*/appStatus = AppStatus.Loading })
+                is AppStatus.Error -> ReminderListError(appStatus.message, { reminderListState.loadReminders() })
                 is AppStatus.Ready -> ReminderList(
-                    (appStatus as AppStatus.Ready).data,
+                    appStatus.data,
                     onCreate = {
                         navController.navigate("new")
                     },
@@ -39,22 +46,30 @@ fun AppNavigation() {
             }
         }
         composable("new") {
-            ReminderNew(onCreate = { reminder ->
-                if(appStatus is AppStatus.Ready)
-                    (appStatus as AppStatus.Ready).data.add(reminder)
-                navController.popBackStack()
+            ReminderNew(onCreate = { reminder, error ->
+                reminderListState.storeReminder(reminder, {
+                    navController.popBackStack()
+                    reminderListState.loadReminders()
+                }, error)
             })
         }
         composable("details/{id}", listOf(navArgument("id") { type = NavType.IntType })) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: -1
-            if(appStatus !is AppStatus.Ready || id !in 0 .. (appStatus as AppStatus.Ready).data.size)
+            val appStatus = reminderListState.appStatus.collectAsState().value
+            if(appStatus !is AppStatus.Ready || id !in 0 .. appStatus.data.size)
                 Text("Invalid ID.")
             else
                 ReminderDetails(
-                    remember { (appStatus as AppStatus.Ready).data[id] },
+                    remember { appStatus.data[id] },
                     onRemove = {
-                        (appStatus as AppStatus.Ready).data.removeAt(id)
-                        navController.popBackStack()
+                        reminderListState.removeReminder(
+                            idx = id,
+                            onSuccess = {
+                                navController.popBackStack()
+                                reminderListState.loadReminders()
+                            },
+                            onError = it
+                        )
                     }
                 )
         }

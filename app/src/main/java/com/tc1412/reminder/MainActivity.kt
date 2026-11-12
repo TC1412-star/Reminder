@@ -10,46 +10,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.tc1412.reminder.repositories.ReminderRepository
+import com.tc1412.reminder.repositories.TestRepository
 import com.tc1412.reminder.ui.theme.ReminderTheme
+import com.tc1412.reminder.viewmodels.ReminderList
 import java.time.LocalDateTime
-val reminders : List<Reminder> = listOf(
-    Reminder(
-        id = 2,
-        name = "Another test",
-        description = "Esto es una prueba de un recordatorio.",
-        time = LocalDateTime.of(
-            2026, 11, 5,
-            15, 0, 0
-        ),
-        category = Category.Social,
-        priority = Priority.Medium
-    ),
-    Reminder(
-        id = 3,
-        name = "Otra prueba",
-        description = "Esto es un recordatorio simulado :)",
-        time = LocalDateTime.of(
-            2026, 12, 14,
-            18, 45, 0
-        ),
-        category = Category.Personal,
-        priority = Priority.Low
-    ),
-    Reminder(
-        id = 1,
-        name = "Test",
-        description = "Just a test reminder :)",
-        time = LocalDateTime.of(
-            2026, 10, 29,
-            14, 30, 0
-        ),
-        category = Category.Work,
-        priority = Priority.High
-    )
-)
-var appStatus: AppStatus by mutableStateOf(
-    AppStatus.Ready(mutableStateListOf<Reminder>().apply { addAll(reminders) })
-)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
