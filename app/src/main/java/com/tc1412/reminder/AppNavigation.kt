@@ -54,7 +54,6 @@ fun AppNavigation() {
                     (appStatus as AppStatus.Ready).data.add(reminder)
                 navController.popBackStack()
             })
-            CircularProgressIndicator()
         }
         composable("details/{id}", listOf(navArgument("id") { type = NavType.IntType })) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: -1
