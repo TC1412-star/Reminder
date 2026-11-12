@@ -1,5 +1,6 @@
 package com.tc1412.reminder
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import java.time.LocalDateTime
 
 sealed class Category(val name: String) {
@@ -14,7 +15,7 @@ sealed class Priority(val name: String) {
 }
 sealed class AppStatus {
     object Loading : AppStatus()
-    object Ready : AppStatus()
+    data class Ready(val data: SnapshotStateList<Reminder>) : AppStatus()
     data class Error(val message:String) : AppStatus()
 }
 data class Reminder(
