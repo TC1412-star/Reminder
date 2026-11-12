@@ -29,83 +29,56 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.tc1412.reminder.Category
+import com.tc1412.reminder.NewReminderState
+import com.tc1412.reminder.NewReminderStatus
 import com.tc1412.reminder.Priority
 import com.tc1412.reminder.Reminder
 import com.tc1412.reminder.customcomps.CategoryPicker
+import com.tc1412.reminder.customcomps.DateTimePicker
 import com.tc1412.reminder.customcomps.PriorityPicker
+import com.tc1412.reminder.viewmodels.ReminderNew
 import java.time.LocalDateTime
 import java.time.Month
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderNew(onCreate : (Reminder, (Exception) -> Unit) -> Unit) {
-    Log.d("AAA", "Hello world! :)")
-
-    var name by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
-    var category by remember { mutableStateOf<Category?>(null) }
-    var priority by remember { mutableStateOf<Priority?>(null) }
-    var day by rememberSaveable { mutableStateOf("01") }
-    var month by rememberSaveable { mutableStateOf("01") }
-    var year by rememberSaveable { mutableStateOf("2027") }
-    var hour by rememberSaveable { mutableStateOf("12") }
-    var minute by rememberSaveable { mutableStateOf("30") }
-
-    val trimmedName = name.trim()
-    val Y = year.toIntOrNull()
-    val M = month.toIntOrNull()
-    val D = day.toIntOrNull()
-    val h = hour.toIntOrNull()
-    val m = minute.toIntOrNull()
-    val validateName = trimmedName.length >= 4
-    val validateDescription = description.length <= 200
-    val validateDate = Y != null
-            && M?.let { x -> x in 1..12 } ?: false
-            && D?.let { x -> x in 1..Month.of(M).length(Y % 4 == 0) } ?: false
-    val validateTime = h?.let { x -> x in 0 .. 23 } ?: false
-            && m?.let { x -> x in 0 .. 59 } ?: false
-
-    var sending by rememberSaveable { mutableStateOf(false) }
-
+fun ReminderNew(status: ReminderNew, onSuccess : () -> Unit) {
     Scaffold(topBar = { TopAppBar({Text("Nuevo recordatorio")}) }) { innerPadding ->
         Card(Modifier.padding(innerPadding)) {
             Column {
                 Text("Nombre:")
-                TextField(name, { txt -> name = txt }, Modifier.fillMaxWidth(), placeholder = { Text("Nombre del recordatorio") }, isError = !validateName, supportingText = { Text("El nombre debe tener al menos 4 caracteres, sin contar espacios iniciales ni finales.") })
+                TextField(status.status.title, { status.setTitle(it) }, Modifier.fillMaxWidth(), placeholder = { Text("Nombre del recordatorio") }, isError = status.titleError, supportingText = { Text("El nombre debe tener al menos 4 caracteres, sin contar espacios iniciales ni finales.") })
 
                 Text("Descripción:")
-                TextField(description, { txt -> description = txt }, Modifier.fillMaxWidth(), placeholder = { Text("Descripción del recordatorio") }, isError = !validateDescription, supportingText = { Text("${description.length}/200 caracteres") })
+                TextField(status.status.description, { status.setDescription(it) }, Modifier.fillMaxWidth(), placeholder = { Text("Descripción del recordatorio") }, isError = status.descriptionError, supportingText = { Text("${status.status.description.length}/200 caracteres") })
 
-                Text("Fecha:")
-                Row(Modifier.fillMaxWidth()) {
-                    TextField(day, { txt -> day = txt }, placeholder = { Text("Día") }, label = { Text("Día") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
-                    TextField(month, { txt -> month = txt }, placeholder = { Text("Mes") }, label = { Text("Mes") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
-                    TextField(year, { txt -> year = txt }, placeholder = { Text("Año") }, label = { Text("Año") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
-                }
-
-                Text("Hora:")
-                Row(Modifier.fillMaxWidth()) {
-                    TextField(hour, { txt -> hour = txt }, placeholder = { Text("Día") }, label = { Text("Día") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateTime, modifier = Modifier.weight(1f))
-                    TextField(minute, { txt -> minute = txt }, placeholder = { Text("Mes") }, label = { Text("Mes") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateTime, modifier = Modifier.weight(1f))
-                }
+                Text("Fecha y hora:")
+                DateTimePicker(status.status.dateTime, {status.status})
 
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Categoría:")
-                    CategoryPicker(category, {category = it})
+                    CategoryPicker(status.status.category, {status.setCategory(it)})
                 }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Prioridad:")
-                    PriorityPicker(priority, {priority = it})
+                    PriorityPicker(status.status.priority, {status.setPriority(it)})
                 }
 
+                val sending = status.state.collectAsStateWithLifecycle().value is NewReminderStatus.Sending
                 Button({
-                    val rem = Reminder(0, trimmedName, description, LocalDateTime.of(Y!!, M!!, D!!, h!!, m!!), category!!, priority!!)
-                    sending = true
-                    onCreate(rem, {sending = false})
-                }, enabled = !sending && validateName && validateDate && validateTime && category != null && priority != null, modifier = Modifier.fillMaxWidth()) {
-                    Text(if(sending) "Guardando..." else "Guardar")
+                    status.send(onSuccess)
+                }, enabled = !status.cannotSend && !sending, modifier = Modifier.fillMaxWidth()) {
+                    /*Text(if(status) "Guardando..." else "Guardar")
                     if(sending)
+                        CircularProgressIndicator()*/
+                    if(sending) {
+                        Text("Guardando...")
                         CircularProgressIndicator()
+                    } else {
+                        Text("Guardar")
+                    }
                 }
             }
         }

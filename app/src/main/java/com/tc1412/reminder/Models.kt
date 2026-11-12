@@ -20,6 +20,19 @@ sealed class AppStatus {
     data class Ready(val data: List<Reminder>) : AppStatus()
     data class Error(val message:String) : AppStatus()
 }
+sealed class NewReminderStatus {
+    object Creating : NewReminderStatus()
+    object Sending : NewReminderStatus()
+    object Sent : NewReminderStatus()
+    data class Error(val message:String) : NewReminderStatus()
+}
+data class NewReminderState(
+    val title: String = "",
+    val description: String = "",
+    val category: Category? = null,
+    val priority: Priority? = null,
+    val dateTime: LocalDateTime = LocalDateTime.now()
+)
 data class Reminder(
     val id : Int,
     var name : String,

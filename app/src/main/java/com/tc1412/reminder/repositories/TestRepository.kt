@@ -48,7 +48,7 @@ class TestRepository : ReminderRepository {
 
         if(simulatingError) {
             simulatingError = false
-            throw Exception("Test error :(")
+            throw Exception("Algo pasó :(")
         }
         return reminders
     }
