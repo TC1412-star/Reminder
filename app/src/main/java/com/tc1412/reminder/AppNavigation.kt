@@ -1,20 +1,9 @@
 package com.tc1412.reminder
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.tc1412.reminder.screens.ReminderDetails
 import com.tc1412.reminder.screens.ReminderList
+import com.tc1412.reminder.screens.ReminderListError
 import com.tc1412.reminder.screens.ReminderNew
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +26,7 @@ fun AppNavigation() {
         composable("list") {
             when(appStatus) {
                 is AppStatus.Loading -> ReminderList()
-                is AppStatus.Error -> ReminderList((appStatus as AppStatus.Error).message)
+                is AppStatus.Error -> ReminderListError((appStatus as AppStatus.Error).message, { /*System.out.print("Reintentando... (simulado)")*/appStatus = AppStatus.Loading })
                 is AppStatus.Ready -> ReminderList(
                     (appStatus as AppStatus.Ready).data,
                     onCreate = {

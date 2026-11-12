@@ -1,28 +1,16 @@
 package com.tc1412.reminder
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.util.fastJoinToString
-import com.tc1412.reminder.screens.ReminderDetails
-import com.tc1412.reminder.screens.ReminderList
-import com.tc1412.reminder.screens.ReminderNew
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.tc1412.reminder.ui.theme.ReminderTheme
-import java.sql.Date
 import java.time.LocalDateTime
 val reminders : List<Reminder> = listOf(
     Reminder(
@@ -59,7 +47,9 @@ val reminders : List<Reminder> = listOf(
         priority = Priority.High
     )
 )
-var appStatus:AppStatus = AppStatus.Ready(mutableStateListOf<Reminder>().apply { addAll(reminders) })
+var appStatus: AppStatus by mutableStateOf(
+    AppStatus.Ready(mutableStateListOf<Reminder>().apply { addAll(reminders) })
+)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
