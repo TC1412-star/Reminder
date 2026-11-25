@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.tc1412.reminder.FormatTime
 import com.tc1412.reminder.Reminder
-import com.tc1412.reminder.ShortFormatTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +31,7 @@ fun ReminderDetails(reminder: Reminder, onRemove: ((Exception) -> Unit) -> Unit)
         Column(Modifier.padding(inPad)) {
             Text(reminder.name, Modifier.fillMaxWidth(), fontSize = 24.sp, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline, textAlign = TextAlign.Center)
             Text(reminder.description, fontStyle = FontStyle.Italic)
-            Text("Establecido para el ${FormatTime(reminder.time)}.")
+            Text("Establecido para el ${FormatTime(reminder.dateTime)}.")
             Text("Categoría: ${reminder.category.name} | Prioridad: ${reminder.priority.name}")
             Button({removing=true;onRemove({removing=false});}, enabled = !removing, modifier =  Modifier.fillMaxWidth()) {
                 if(removing) {

@@ -12,7 +12,7 @@ class TestRepository : ReminderRepository {
             id = 2,
             name = "Another test",
             description = "Esto es una prueba de un recordatorio.",
-            time = LocalDateTime.of(
+            dateTime = LocalDateTime.of(
                 2026, 11, 5,
                 15, 0, 0
             ),
@@ -23,7 +23,7 @@ class TestRepository : ReminderRepository {
             id = 3,
             name = "Otra prueba",
             description = "Esto es un recordatorio simulado :)",
-            time = LocalDateTime.of(
+            dateTime = LocalDateTime.of(
                 2026, 12, 14,
                 18, 45, 0
             ),
@@ -34,7 +34,7 @@ class TestRepository : ReminderRepository {
             id = 1,
             name = "Test",
             description = "Just a test reminder :)",
-            time = LocalDateTime.of(
+            dateTime = LocalDateTime.of(
                 2026, 10, 29,
                 14, 30, 0
             ),
@@ -59,8 +59,12 @@ class TestRepository : ReminderRepository {
         reminders.add(rem)
     }
 
-    override suspend fun removeReminder(idx: Int) {
+    override suspend fun removeReminder(id: Long) {
         delay(1500)
-        reminders.removeAt(idx)
+        reminders.removeIf { it.id == id }
+    }
+
+    override suspend fun newID(): Long {
+        return reminders.maxOfOrNull { it.id }?.plus(1) ?: 0
     }
 }

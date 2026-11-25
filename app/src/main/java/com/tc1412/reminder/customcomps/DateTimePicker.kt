@@ -35,21 +35,20 @@ fun DateTimePicker(dateTime: LocalDateTime, onSet: (LocalDateTime) -> Unit, modi
     val validateTime = h?.let { x -> x in 0 .. 23 } ?: false
             && m?.let { x -> x in 0 .. 59 } ?: false
 
+    fun set() {
+        if(validateDate && validateTime)
+            onSet(LocalDateTime.of(Y, M, D, h, m))
+    }
     Text("Fecha:")
     Row(Modifier.fillMaxWidth()) {
-        TextField(day, { txt -> day = txt }, placeholder = { Text("Día") }, label = { Text("Día") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
-        TextField(month, { txt -> month = txt }, placeholder = { Text("Mes") }, label = { Text("Mes") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
-        TextField(year, { txt -> year = txt }, placeholder = { Text("Año") }, label = { Text("Año") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
+        TextField(day, { txt -> day = txt; set(); }, placeholder = { Text("Día") }, label = { Text("Día") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
+        TextField(month, { txt -> month = txt; set(); }, placeholder = { Text("Mes") }, label = { Text("Mes") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
+        TextField(year, { txt -> year = txt; set(); }, placeholder = { Text("Año") }, label = { Text("Año") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateDate, modifier = Modifier.weight(1f))
     }
 
     Text("Hora:")
     Row(Modifier.fillMaxWidth()) {
-        TextField(hour, { txt -> hour = txt }, placeholder = { Text("Día") }, label = { Text("Día") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateTime, modifier = Modifier.weight(1f))
-        TextField(minute, { txt -> minute = txt }, placeholder = { Text("Mes") }, label = { Text("Mes") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateTime, modifier = Modifier.weight(1f))
-    }
-
-    fun set() {
-        if(validateDate && validateTime)
-            onSet(LocalDateTime.of(Y, M, D, h, m))
+        TextField(hour, { txt -> hour = txt; set(); }, placeholder = { Text("Día") }, label = { Text("Día") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateTime, modifier = Modifier.weight(1f))
+        TextField(minute, { txt -> minute = txt; set(); }, placeholder = { Text("Mes") }, label = { Text("Mes") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), isError = !validateTime, modifier = Modifier.weight(1f))
     }
 }

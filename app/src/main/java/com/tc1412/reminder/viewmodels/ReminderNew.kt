@@ -62,10 +62,10 @@ class ReminderNew(
             try {
                 _state.value = NewReminderStatus.Sending
                 repository.storeReminder(Reminder(
-                    id = 0,
+                    id = repository.newID(),
                     name = status.title,
                     description = status.description,
-                    time = status.dateTime,
+                    dateTime = status.dateTime,
                     category = status.category!!,
                     priority = status.priority!!
                 ))

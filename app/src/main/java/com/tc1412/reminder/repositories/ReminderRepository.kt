@@ -5,5 +5,6 @@ import com.tc1412.reminder.Reminder
 interface ReminderRepository {
     suspend fun getReminders() : List<Reminder>
     suspend fun storeReminder(rem:Reminder)
-    suspend fun removeReminder(idx:Int)
+    suspend fun removeReminder(id:Long)
+    suspend fun newID() : Long
 }

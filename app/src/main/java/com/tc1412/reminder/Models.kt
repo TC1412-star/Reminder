@@ -1,6 +1,6 @@
 package com.tc1412.reminder
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.tc1412.reminder.database.ReminderEntity
 import java.time.LocalDateTime
 
 sealed class Category(val name: String) {
@@ -17,7 +17,7 @@ sealed class Priority(val name: String) {
 val allPriorities = listOf(Priority.Low, Priority.Medium, Priority.High)
 sealed class AppStatus {
     object Loading : AppStatus()
-    data class Ready(val data: List<Reminder>) : AppStatus()
+    data class Ready(val data: List<Reminder>, val databaseError: Boolean = false) : AppStatus()
     data class Error(val message:String) : AppStatus()
 }
 sealed class NewReminderStatus {
@@ -34,10 +34,34 @@ data class NewReminderState(
     val dateTime: LocalDateTime = LocalDateTime.now()
 )
 data class Reminder(
-    val id : Int,
+    val id : Long,
+    var remote_id : Int? = null,
     var name : String,
     var description : String,
-    var time : LocalDateTime,
+    var dateTime : LocalDateTime,
     var category: Category,
     var priority: Priority
-)
+) {
+    fun toEntity() : ReminderEntity {
+        return ReminderEntity(
+            id = id,
+            remoteId = null,
+            name = name,
+            description = description,
+            category = category,
+            priority = priority,
+            dateTime = dateTime
+        )
+    }
+    companion object{
+        fun fromEntity(entity: ReminderEntity) = Reminder(
+            entity.id,
+            entity.remoteId,
+            entity.name,
+            entity.description,
+            entity.dateTime,
+            entity.category,
+            entity.priority
+        )
+    }
+}

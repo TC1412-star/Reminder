@@ -55,7 +55,7 @@ fun ReminderNew(status: ReminderNew, onSuccess : () -> Unit) {
                 TextField(status.status.description, { status.setDescription(it) }, Modifier.fillMaxWidth(), placeholder = { Text("Descripción del recordatorio") }, isError = status.descriptionError, supportingText = { Text("${status.status.description.length}/200 caracteres") })
 
                 Text("Fecha y hora:")
-                DateTimePicker(status.status.dateTime, {status.status})
+                DateTimePicker(status.status.dateTime, {status.setDateTime(it)})
 
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Categoría:")

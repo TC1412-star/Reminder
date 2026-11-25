@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tc1412.reminder.AppStatus
 import com.tc1412.reminder.Reminder
+import com.tc1412.reminder.repositories.DatabaseException
 import com.tc1412.reminder.repositories.ReminderRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +25,8 @@ class ReminderList(private val repository: ReminderRepository) : ViewModel() {
 
             try {
                 _appStatus.value = AppStatus.Ready(mutableStateListOf<Reminder>().apply { addAll(repository.getReminders()) })
+            } catch (e: DatabaseException) {
+                _appStatus.value = AppStatus.Ready(mutableStateListOf<Reminder>().apply { addAll(e.localReminders) }, true)
             } catch (e: Exception) {
                 _appStatus.value = AppStatus.Error(e.message ?: "Un error desconocido ocurrió,")
             }
@@ -40,10 +43,10 @@ class ReminderList(private val repository: ReminderRepository) : ViewModel() {
             }
         }
     }
-    fun removeReminder(idx: Int, onSuccess: (() -> Unit)? = null, onError: ((Exception) -> Unit)? = null) {
+    fun removeReminder(id: Long, onSuccess: (() -> Unit)? = null, onError: ((Exception) -> Unit)? = null) {
         viewModelScope.launch {
             try {
-                repository.removeReminder(idx)
+                repository.removeReminder(id)
                 onSuccess?.invoke()
             } catch (e: Exception) {
                 onError?.invoke(e)
